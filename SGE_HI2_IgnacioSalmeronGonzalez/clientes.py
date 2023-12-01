@@ -1,10 +1,12 @@
+import os
 import tkinter as tk
 import customtkinter as ctk
 import pandas as pd
-from tkinter import ttk
+from tkinter import ttk, messagebox
 import sqlite3
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import datetime
 
 # Declaración de variables globales
 entryId = None
@@ -38,22 +40,28 @@ def insert():
     cp = entryCp.get()
     tlf = entryTlf.get()
 
-    # Insertamos los datos en la tabla
-    cursor.execute("INSERT INTO clientes (nombre, apellido, direccion, cp, tlf) VALUES (?, ?, ?, ?, ?)",
-                   (nombre, apellido, direccion, cp, tlf))
+    #Comprobamos si los campos están completos
+    if(not nombre or not apellido or not direccion or not cp or not tlf):
+        messagebox.showinfo(message="No todos los campos están completos. Rellene todos a excepción del id.",
+                            title="Error en sentencia INSERT")
 
-    # Confirmamos la sentencia insert
-    conexion.commit()
+    else:
+        # Insertamos los datos en la tabla
+        cursor.execute("INSERT INTO clientes (nombre, apellido, direccion, cp, tlf) VALUES (?, ?, ?, ?, ?)",
+                       (nombre, apellido, direccion, cp, tlf))
 
-    # Limpiamos los Entry después de la inserción
-    entryNom.delete(0, "end")
-    entryApe.delete(0, "end")
-    entryDir.delete(0, "end")
-    entryCp.delete(0, "end")
-    entryTlf.delete(0, "end")
+        # Confirmamos la sentencia insert
+        conexion.commit()
 
-    # Actualizamos la tabla
-    mostrarDatos(cursor, tablaClientes)
+        # Limpiamos los Entry después de la inserción
+        entryNom.delete(0, "end")
+        entryApe.delete(0, "end")
+        entryDir.delete(0, "end")
+        entryCp.delete(0, "end")
+        entryTlf.delete(0, "end")
+
+        # Actualizamos la tabla
+        mostrarDatos(cursor, tablaClientes)
 
 def update():
     # Obtenemos los valores de los Entry
@@ -64,42 +72,62 @@ def update():
     cp = entryCp.get()
     tlf = entryTlf.get()
 
-    # Actualizamos los datos en la tabla
-    cursor.execute("UPDATE clientes SET nombre = ?, apellido = ?, direccion = ?, cp = ?, tlf = ? WHERE id = ?",
-                   (nombre, apellido, direccion, cp, tlf, id))
+    # Comprobamos si los campos están completos
+    if (not id or not nombre or not apellido or not direccion or not cp or not tlf):
+        messagebox.showinfo(message="No todos los campos están completos. Debe rellenar todos para actualizar una entrada de la tabla.",
+                            title="Error en sentencia UPDATE")
 
-    # Confirmamos la sentencia update
-    conexion.commit()
+    else:
+        # Actualizamos los datos en la tabla
+        cursor.execute("UPDATE clientes SET nombre = ?, apellido = ?, direccion = ?, cp = ?, tlf = ? WHERE id = ?",
+                       (nombre, apellido, direccion, cp, tlf, id))
 
-    # Limpiamos los Entry después de la inserción
-    entryNom.delete(0, "end")
-    entryApe.delete(0, "end")
-    entryDir.delete(0, "end")
-    entryCp.delete(0, "end")
-    entryTlf.delete(0, "end")
+        # Confirmamos la sentencia update
+        conexion.commit()
 
-    # Actualizamos la tabla
-    mostrarDatos(cursor, tablaClientes)
+        # Limpiamos los Entry después de la inserción
+        entryNom.delete(0, "end")
+        entryApe.delete(0, "end")
+        entryDir.delete(0, "end")
+        entryCp.delete(0, "end")
+        entryTlf.delete(0, "end")
+
+        # Actualizamos la tabla
+        mostrarDatos(cursor, tablaClientes)
+
 
 def delete():
     #Obtenemos el id
     id = entryId.get()
 
-    #Eliminamos la sentencia que coincida con ese id
-    cursor.execute("DELETE FROM clientes WHERE id=?", id)
-    conexion.commit()
+    #Comprobamos
+    if (not id):
+        messagebox.showinfo(message="Introduzca el id de la entrada que desee eliminar.",
+                            title="Error en sentencia DELETE")
 
-    entryId.delete(0, "end")
+    else:
+        # Eliminamos la sentencia que coincida con ese id
+        cursor.execute('''DELETE FROM clientes WHERE id = ?''', (id,))
+        conexion.commit()
 
-    mostrarDatos(cursor, tablaClientes)
+        entryId.delete(0, "end")
+
+        mostrarDatos(cursor, tablaClientes)
 
 def convertCSV():
     #Creamos un dataframe con los datos de nuestra tabla
     sql = pd.read_sql_query ('''SELECT * FROM clientes''', conexion)
     df = pd.DataFrame(sql, columns = ['id', 'nombre', 'apellido', 'direccion', 'cp', 'tlf'])
 
-    #Y los exportamos a un archivo .csv
-    df.to_csv('tabla_clientes.csv')
+    #Creamos el nombre del documento con la fecha actual
+    time = datetime.datetime.now()
+    fecha = time.strftime('%d_%m_%Y-%H_%M_%S')
+    nombre="tabla_clientes-" + fecha + ".csv"
+
+    # Combinamos la ruta de la carpeta con el nombre del archivo y lo guardamos
+    carpeta = os.path.join(os.getcwd(), 'CSVs')
+    ruta = os.path.join(carpeta, nombre)
+    df.to_csv(ruta)
 
 def grafico():
     # Creamos un dataframe con los datos que mostraremos en nuestro gráfico
@@ -195,7 +223,7 @@ def clientes():
     btnCSV = (ctk.CTkButton(ventana, text="EXPORTAR A CSV", command=convertCSV))
     btnCSV.grid(row=4, column=3, pady=10)
 
-    btnGrafico = (ctk.CTkButton(ventana, text="GRÁFICO", command=grafico))
+    btnGrafico = (ctk.CTkButton(ventana, text="MOSTRAR GRÁFICO", command=grafico))
     btnGrafico.grid(row=4, column=1, pady=10)
 
     #Creamos el treeview
@@ -208,10 +236,6 @@ def clientes():
     tablaClientes.heading("direccion", text="Dirección")
     tablaClientes.heading("cp", text="Código postal", command=lambda: ordenarPorColumna(tablaClientes, "cp", False))
     tablaClientes.heading("tlf", text="Teléfono")
-
-    #Aplicamos estilo al encabezado
-    #estiloTreeview = tk.style()
-    #estiloTreeview.configure("Treeview", background="blue", foreground="white")
 
     #Rellenamos el treeview con los datos de nuestra tabla, y lo mostramos
     mostrarDatos(cursor, tablaClientes)
