@@ -42,27 +42,38 @@ def insert():
     precio = entryPr.get()
     stock = entrySt.get()
 
-    #Comprobamos si los campos están completos
-    if(not nombre or not categoria or not precio or not stock):
-        messagebox.showinfo(message="No todos los campos están completos. Rellene todos a excepción del id.",
-                            title="Error en sentencia INSERT")
-
+    # Comprobamos si los campos están completos
+    if not nombre or not categoria or not precio or not stock:
+        messagebox.showinfo(
+            message="No todos los campos están completos. Rellene todos a excepción del id.",
+            title="Error en sentencia INSERT")
     else:
-        # Insertamos los datos en la tabla
-        cursor.execute("INSERT INTO productos (nombre, id_categoria, precio, stock) VALUES (?, ?, ?, ?)",
-                       (nombre, categoria, precio, stock))
+        try:
+            # Convertimos a enteros o floats según corresponda
+            precio = float(precio)
+            stock = int(stock)
+            categoria = int(categoria)
 
-        # Confirmamos la sentencia insert
-        conexion.commit()
+            # Insertamos los datos en la tabla
+            cursor.execute("INSERT INTO productos (nombre, id_categoria, precio, stock) VALUES (?, ?, ?, ?)",
+                           (nombre, categoria, precio, stock))
 
-        # Limpiamos los Entry después de la inserción
-        entryNom.delete(0, "end")
-        entryCat.delete(0, "end")
-        entryPr.delete(0, "end")
-        entrySt.delete(0, "end")
+            # Confirmamos la sentencia insert
+            conexion.commit()
 
-        # Actualizamos la tabla
-        mostrarDatos(cursor, tablaProductos)
+            # Limpiamos los Entry después de la inserción
+            entryNom.delete(0, "end")
+            entryCat.delete(0, "end")
+            entryPr.delete(0, "end")
+            entrySt.delete(0, "end")
+
+            # Actualizamos la tabla
+            mostrarDatos(cursor, tablaProductos)
+
+        except ValueError as e:
+            mensajeError = f"Error en la entrada de datos. Compruebe que el tipo de dato introducido sea correcto. Cod. error: {str(e)}"
+            messagebox.showinfo(
+                message=mensajeError, title="Error en sentencia INSERT")
 
 def update():
     # Obtenemos los valores de los Entry
@@ -170,7 +181,7 @@ def productos():
     #Config. general de la ventana
     ctk.set_appearance_mode("dark")
     ventana = ctk.CTk()
-    ventana.geometry("970x485")
+    ventana.geometry("925x600")
     ventana.title("Productos")
 
     #Conexión con la BBDD. Se crea si no existe
@@ -194,41 +205,44 @@ def productos():
 
 
     #Botones y elementos visuales
-    ctk.CTkLabel(ventana, text="Id:").grid(row=0, column=0, sticky="e", padx=10, pady=10)
+    titulo = ctk.CTkLabel(ventana, text="PRODUCTOS", font=("Eras Demi ITC", 30))
+    titulo.grid(row=0, column=0, columnspan=6, padx=10, pady=20)
+
+    ctk.CTkLabel(ventana, text="Id:", font=("Eras Demi ITC", 15)).grid(row=1, column=0, sticky="e", padx=10, pady=10)
     entryId = ctk.CTkEntry(ventana)
-    entryId.grid(row=0, column=1, padx=15, pady=15)
+    entryId.grid(row=1, column=1, padx=15, pady=15)
 
-    ctk.CTkLabel(ventana, text="Nombre:").grid(row=0, column=2, sticky="e", padx=10, pady=10)
+    ctk.CTkLabel(ventana, text="Nombre:", font=("Eras Demi ITC", 15)).grid(row=1, column=2, sticky="e", padx=10, pady=10)
     entryNom = ctk.CTkEntry(ventana)
-    entryNom.grid(row=0, column=3, padx=15, pady=15)
+    entryNom.grid(row=1, column=3, padx=15, pady=15)
 
-    ctk.CTkLabel(ventana, text="Categoría (id):").grid(row=0, column=4, sticky="e", padx=10, pady=10)
+    ctk.CTkLabel(ventana, text="Categoría (id):", font=("Eras Demi ITC", 15)).grid(row=1, column=4, sticky="e", padx=10, pady=10)
     entryCat = ctk.CTkEntry(ventana)
-    entryCat.grid(row=0, column=5, padx=15, pady=15)
+    entryCat.grid(row=1, column=5, padx=15, pady=15)
 
-    ctk.CTkLabel(ventana, text="Precio:").grid(row=1, column=0, sticky="e", padx=10, pady=10)
+    ctk.CTkLabel(ventana, text="Precio:", font=("Eras Demi ITC", 15)).grid(row=2, column=0, sticky="e", padx=10, pady=10)
     entryPr = ctk.CTkEntry(ventana)
-    entryPr.grid(row=1, column=1, padx=15, pady=15)
+    entryPr.grid(row=2, column=1, padx=15, pady=15)
 
-    ctk.CTkLabel(ventana, text="Stock:").grid(row=1, column=2, sticky="e", padx=10, pady=10)
+    ctk.CTkLabel(ventana, text="Stock:", font=("Eras Demi ITC", 15)).grid(row=2, column=2, sticky="e", padx=10, pady=10)
     entrySt = ctk.CTkEntry(ventana)
-    entrySt.grid(row=1, column=3, padx=15, pady=15)
+    entrySt.grid(row=2, column=3, padx=15, pady=15)
 
     #Botones CRUD
-    btnInsert = (ctk.CTkButton(ventana, text="AÑADIR", command=insert))
-    btnInsert.grid(row=2, column=2, pady=10)
+    btnInsert = (ctk.CTkButton(ventana, text="AÑADIR", command=insert, font=("Eras Demi ITC", 12)))
+    btnInsert.grid(row=3, column=2, pady=10)
 
-    btnUpdate = (ctk.CTkButton(ventana, text="ACTUALIZAR", command=update))
-    btnUpdate.grid(row=2, column=3, pady= 10)
+    btnUpdate = (ctk.CTkButton(ventana, text="ACTUALIZAR", command=update, font=("Eras Demi ITC", 12)))
+    btnUpdate.grid(row=3, column=3, pady= 10)
 
-    btnDelete = (ctk.CTkButton(ventana, text="ELIMINAR", command=delete))
-    btnDelete.grid(row=2, column=4, pady=10)
+    btnDelete = (ctk.CTkButton(ventana, text="ELIMINAR", command=delete, font=("Eras Demi ITC", 12)))
+    btnDelete.grid(row=3, column=4, pady=10)
 
-    btnCSV = (ctk.CTkButton(ventana, text="EXPORTAR A CSV", command=convertCSV))
-    btnCSV.grid(row=4, column=3, pady=10)
+    btnCSV = (ctk.CTkButton(ventana, text="EXPORTAR A CSV", command=convertCSV, font=("Eras Demi ITC", 12)))
+    btnCSV.grid(row=5, column=3, pady=10)
 
-    btnGrafico = (ctk.CTkButton(ventana, text="MOSTRAR GRÁFICO", command=grafico))
-    btnGrafico.grid(row=4, column=1, pady=10)
+    btnGrafico = (ctk.CTkButton(ventana, text="MOSTRAR GRÁFICO", command=grafico, font=("Eras Demi ITC", 12)))
+    btnGrafico.grid(row=5, column=1, pady=10)
 
     #Creamos el treeview
     tablaProductos = ttk.Treeview(ventana, columns=("id", "nombre", "categoria", "precio", "stock"),
@@ -242,7 +256,7 @@ def productos():
 
     #Rellenamos el treeview con los datos de nuestra tabla, y lo mostramos
     mostrarDatos(cursor, tablaProductos)
-    tablaProductos.grid(row=3, column=1, padx=20, pady=20, rowspan=1, columnspan=5, sticky="nsew")
+    tablaProductos.grid(row=4, column=1, padx=20, pady=20, rowspan=1, columnspan=5, sticky="nsew")
     for col in ("id", "nombre", "categoria", "precio", "stock"):
         tablaProductos.column(col, width=130)
 

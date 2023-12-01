@@ -43,48 +43,57 @@ def insert():
     cliente = entryCli.get()
     fecha = entryFecha.get()
 
-    #Comprobamos si los campos están completos
-    if(not producto or not unidades or not cliente or not fecha):
-        messagebox.showinfo(message="No todos los campos están completos. Rellene todos a excepción del id.",
-                            title="Error en sentencia INSERT")
-
+    # Comprobamos si los campos están completos
+    if not producto or not unidades or not cliente or not fecha:
+        messagebox.showinfo(
+            message="No todos los campos están completos. Rellene todos a excepción del id.",
+            title="Error en sentencia INSERT")
     else:
-        # Insertamos los datos en las tablas
-        cursor.execute("INSERT INTO pedidos (id, fechapedido) VALUES (?, ?)",
-                       (cliente, fecha))
+        try:
+            # Convertimos a enteros o floats según corresponda
+            producto = int(producto)
+            unidades = int(unidades)
+            cliente = int(cliente)
 
-        # Confirmamos la sentencia insert
-        conexion.commit()
+            # Insertamos los datos en las tablas
+            cursor.execute("INSERT INTO pedidos (id, fechapedido) VALUES (?, ?)",
+                           (cliente, fecha))
 
-        #Obtenemos el id del pedido
-        cursor.execute("SELECT id_pedido FROM pedidos ORDER BY id_pedido DESC LIMIT 1")
-        numPedido = cursor.fetchone()
-        numPedido = int(numPedido[0])
+            # Confirmamos la sentencia insert
+            conexion.commit()
 
-        #Obtenemos el total del pedido
-        cursor.execute("SELECT precio FROM productos WHERE id_producto = ?", (producto,))
-        precioProducto = cursor.fetchone()
-        precioProducto = float(precioProducto[0])
+            # Obtenemos el id del pedido
+            cursor.execute("SELECT id_pedido FROM pedidos ORDER BY id_pedido DESC LIMIT 1")
+            numPedido = cursor.fetchone()
+            numPedido = int(numPedido[0])
 
-        unidades = int(unidades)
+            # Obtenemos el total del pedido
+            cursor.execute("SELECT precio FROM productos WHERE id_producto = ?", (producto,))
+            precioProducto = cursor.fetchone()
+            precioProducto = float(precioProducto[0])
 
-        total = round(precioProducto * unidades, 2)
+            total = round(precioProducto * unidades, 2)
 
-        #Insertamos los detalles del pedido
-        cursor.execute("INSERT INTO detalle (id_pedido, id_producto, unidades, total) VALUES (?, ?, ?, ?)",
-                       (numPedido, producto, unidades, total))
+            # Insertamos los detalles del pedido
+            cursor.execute("INSERT INTO detalle (id_pedido, id_producto, unidades, total) VALUES (?, ?, ?, ?)",
+                           (numPedido, producto, unidades, total))
 
-        # Confirmamos la sentencia insert
-        conexion.commit()
+            # Confirmamos la sentencia insert
+            conexion.commit()
 
-        # Limpiamos los Entry después de la inserción
-        entryProd.delete(0, "end")
-        entryNum.delete(0, "end")
-        entryCli.delete(0, "end")
-        entryFecha.delete(0, "end")
+            # Limpiamos los Entry después de la inserción
+            entryProd.delete(0, "end")
+            entryNum.delete(0, "end")
+            entryCli.delete(0, "end")
+            entryFecha.delete(0, "end")
 
-        # Actualizamos la tabla
-        mostrarDatos(cursor, tablaPedidos)
+            # Actualizamos la tabla
+            mostrarDatos(cursor, tablaPedidos)
+
+        except ValueError as e:
+            mensajeError = f"Error en la entrada de datos. Compruebe que el tipo de dato introducido sea correcto Cod. error: {str(e)}"
+            messagebox.showinfo(
+                message=mensajeError, title="Error en sentencia INSERT")
 
 def update():
     # Obtenemos los valores de los Entry
@@ -189,7 +198,7 @@ def pedidos():
     #Config. general de la ventana
     ctk.set_appearance_mode("dark")
     ventana = ctk.CTk()
-    ventana.geometry("970x485")
+    ventana.geometry("970x600")
     ventana.title("Clientes")
 
     #Conexión con la BBDD. Se crea si no existe
@@ -214,39 +223,42 @@ def pedidos():
                     )''')
 
     #Botones y elementos visuales
-    ctk.CTkLabel(ventana, text="Id:").grid(row=0, column=0, sticky="e", padx=10, pady=10)
+    titulo = ctk.CTkLabel(ventana, text="PEDIDOS", font=("Eras Demi ITC", 30))
+    titulo.grid(row=0, column=0, columnspan=6, padx=10, pady=20)
+
+    ctk.CTkLabel(ventana, text="Id:", font=("Eras Demi ITC", 15)).grid(row=1, column=0, sticky="e", padx=10, pady=10)
     entryId = ctk.CTkEntry(ventana)
-    entryId.grid(row=0, column=1, padx=15, pady=15)
+    entryId.grid(row=1, column=1, padx=15, pady=15)
 
-    ctk.CTkLabel(ventana, text="Cliente (id):").grid(row=1, column=0, sticky="e", padx=10, pady=10)
+    ctk.CTkLabel(ventana, text="Cliente (id):", font=("Eras Demi ITC", 15)).grid(row=2, column=0, sticky="e", padx=10, pady=10)
     entryCli = ctk.CTkEntry(ventana)
-    entryCli.grid(row=1, column=1, padx=15, pady=15)
+    entryCli.grid(row=2, column=1, padx=15, pady=15)
 
-    ctk.CTkLabel(ventana, text="Producto (id):").grid(row=0, column=2, sticky="e", padx=10, pady=10)
+    ctk.CTkLabel(ventana, text="Producto (id):", font=("Eras Demi ITC", 15)).grid(row=1, column=2, sticky="e", padx=10, pady=10)
     entryProd = ctk.CTkEntry(ventana)
-    entryProd.grid(row=0, column=3, padx=15, pady=15)
+    entryProd.grid(row=1, column=3, padx=15, pady=15)
 
-    ctk.CTkLabel(ventana, text="Nº unidades:").grid(row=0, column=4, sticky="e", padx=10, pady=10)
+    ctk.CTkLabel(ventana, text="Nº unidades:", font=("Eras Demi ITC", 15)).grid(row=1, column=4, sticky="e", padx=10, pady=10)
     entryNum = ctk.CTkEntry(ventana)
-    entryNum.grid(row=0, column=5, padx=15, pady=15)
+    entryNum.grid(row=1, column=5, padx=15, pady=15)
 
-    ctk.CTkLabel(ventana, text="Fecha del pedido:").grid(row=1, column=2, sticky="e", padx=10, pady=10)
+    ctk.CTkLabel(ventana, text="Fecha del pedido:", font=("Eras Demi ITC", 15)).grid(row=2, column=2, sticky="e", padx=10, pady=10)
     entryFecha = DateEntry(ventana, selectmode='day')
-    entryFecha.grid(row=1, column=3, padx=15, pady=15)
+    entryFecha.grid(row=2, column=3, padx=15, pady=15)
 
 
     #Botones CRUD
-    btnInsert = (ctk.CTkButton(ventana, text="AÑADIR", command=insert))
-    btnInsert.grid(row=2, column=2, pady=10)
+    btnInsert = (ctk.CTkButton(ventana, text="AÑADIR", command=insert, font=("Eras Demi ITC", 12)))
+    btnInsert.grid(row=3, column=2, pady=10)
 
-    btnUpdate = (ctk.CTkButton(ventana, text="ACTUALIZAR", command=update))
-    btnUpdate.grid(row=2, column=3, pady= 10)
+    btnUpdate = (ctk.CTkButton(ventana, text="ACTUALIZAR", command=update, font=("Eras Demi ITC", 12)))
+    btnUpdate.grid(row=3, column=3, pady= 10)
 
-    btnDelete = (ctk.CTkButton(ventana, text="ELIMINAR", command=delete))
-    btnDelete.grid(row=2, column=4, pady=10)
+    btnDelete = (ctk.CTkButton(ventana, text="ELIMINAR", command=delete, font=("Eras Demi ITC", 12)))
+    btnDelete.grid(row=3, column=4, pady=10)
 
-    btnCSV = (ctk.CTkButton(ventana, text="EXPORTAR A CSV", command=convertCSV))
-    btnCSV.grid(row=4, column=3, pady=10)
+    btnCSV = (ctk.CTkButton(ventana, text="EXPORTAR A CSV", command=convertCSV, font=("Eras Demi ITC", 12)))
+    btnCSV.grid(row=5, column=3, pady=10)
 
     #Creamos el treeview
     tablaPedidos = ttk.Treeview(ventana, columns=("id", "cliente", "producto", "unidades", "fecha", "total"),
@@ -261,7 +273,7 @@ def pedidos():
 
     #Rellenamos el treeview con los datos de nuestra tabla, y lo mostramos
     mostrarDatos(cursor, tablaPedidos)
-    tablaPedidos.grid(row=3, column=1, padx=20, pady=20, rowspan=1, columnspan=5, sticky="nsew")
+    tablaPedidos.grid(row=4, column=1, padx=20, pady=20, rowspan=1, columnspan=5, sticky="nsew")
     for col in ("id", "cliente", "producto", "unidades", "fecha", "total"):
         tablaPedidos.column(col, width=130)
 

@@ -1,0 +1,33 @@
+,id,nombre,categoria,precio,stock
+0,,Salmón,Pescado/Marisco,15.99,50
+1,,Filete de res,Carnes,12.99,30
+2,,Agua mineral,Bebidas,1.5,100
+3,,Café,Desayuno,3.99,80
+4,,Cereal integral,Cereales,4.99,60
+5,,Leche entera,Lacteos,2.5,120
+6,,Atún enlatado,Pescado/Marisco,2.99,80
+7,,Pollo a la parrilla,Carnes,8.99,40
+8,,Refresco cola,Bebidas,1.0,150
+9,,Pan integral,Desayuno,2.49,100
+10,,Granola,Cereales,5.49,50
+11,,Yogur natural,Lacteos,1.75,90
+12,,Sardinas enlatadas,Pescado/Marisco,1.99,60
+13,,Chuletas de cerdo,Carnes,10.99,35
+14,,Jugo de naranja,Bebidas,2.49,120
+15,,Mermelada de fresa,Desayuno,3.29,70
+16,,Copos de maíz,Cereales,3.99,80
+17,,Queso cheddar,Lacteos,4.99,70
+18,,Langostinos,Pescado/Marisco,18.99,25
+19,,Hamburguesas de ternera,Carnes,14.99,30
+20,,Agua con gas,Bebidas,1.25,90
+21,,Croissants,Desayuno,2.99,60
+22,,Avena instantánea,Cereales,2.79,85
+23,,Yogur de frutas,Lacteos,1.99,110
+24,,Bacalao,Pescado/Marisco,12.99,45
+25,,Costillas de cerdo,Carnes,11.49,20
+26,,Té verde,Bebidas,3.0,75
+27,,Muffins de arándanos,Desayuno,4.49,40
+28,,Cereal de arroz,Cereales,3.49,55
+29,,Leche desnatada,Lacteos,2.0,95
+30,,Magdalenas de chocolate,Desayuno,4.49,12
+31,,Pescadilla,Pescado/Marisco,18.22,29
