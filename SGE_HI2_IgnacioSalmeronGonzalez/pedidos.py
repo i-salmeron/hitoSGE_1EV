@@ -157,7 +157,7 @@ def delete():
 
 def convertCSV():
     #Creamos un dataframe con los datos de nuestra tabla
-    sql = pd.read_sql_query ('''SELECT pedidos.id_pedido, clientes.nombre, productos.nombre, 
+    sql = pd.read_sql_query ('''SELECT pedidos.id_pedido, clientes.nombre as cnombre, productos.nombre as pnombre, 
             detalle.unidades, pedidos.fechapedido, detalle.total
             FROM pedidos
             JOIN clientes ON pedidos.id = clientes.id
