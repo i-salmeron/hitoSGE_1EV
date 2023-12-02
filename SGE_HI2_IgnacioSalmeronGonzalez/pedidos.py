@@ -199,7 +199,7 @@ def pedidos():
     ctk.set_appearance_mode("dark")
     ventana = ctk.CTk()
     ventana.geometry("970x600")
-    ventana.title("Clientes")
+    ventana.title("Pedidos")
 
     #Conexión con la BBDD. Se crea si no existe
     conexion = sqlite3.connect("supermercado.db")
